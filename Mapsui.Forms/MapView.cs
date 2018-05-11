@@ -27,9 +27,9 @@ namespace Mapsui.Forms
 
 			if (startPosition != null)
 			{
-                LastMoveToRegion = startPosition;
-                map.Viewport.Center = startPosition.Center.ToMapsui();
-                map.Viewport.Resolution = 50;
+				LastMoveToRegion = startPosition;
+				map.Viewport.Center = startPosition.Center.ToMapsui();
+				map.Viewport.Resolution = 50;
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace Mapsui.Forms
 				if (map == null)
 					return null;
 
-                return map.Viewport.Extent.ToForms();
+				return map.Viewport.Extent.ToForms();
 			}
 		}
 
@@ -109,7 +109,9 @@ namespace Mapsui.Forms
 		/// Change Viewport 
 		public void MoveToRegion(MapSpan mapSpan)
 		{
-            LastMoveToRegion = mapSpan ?? throw new ArgumentNullException(nameof(mapSpan));
+			if(mapSpan == null) throw new ArgumentNullException(nameof(mapSpan));
+
+			LastMoveToRegion = mapSpan ;
 			map.NavigateTo(LastMoveToRegion.ToMapsui());
 		}
 
@@ -119,7 +121,7 @@ namespace Mapsui.Forms
 			if (pos == null)
 				throw new ArgumentNullException(nameof(pos));
 			LastMoveToRegion = new MapSpan(pos, LastMoveToRegion.LatitudeDegrees, LastMoveToRegion.LongitudeDegrees);
-            map.NavigateTo(LastMoveToRegion.ToMapsui());
+			map.NavigateTo(LastMoveToRegion.ToMapsui());
 		}
 
 		/// <summary>
@@ -163,7 +165,7 @@ namespace Mapsui.Forms
 			RaisePropertyChanged(e.PropertyName);
 		}
 
-        bool init = true;
+		bool init = true;
 
 		/// <summary>
 		/// Get updates from Viewport
@@ -179,13 +181,13 @@ namespace Mapsui.Forms
 			// Did Center changed?
 			if (e.PropertyName.Equals("Center"))
 			{
-                var centerPosition = map.Viewport.Center.ToForms();
+				var centerPosition = map.Viewport.Center.ToForms();
 
 				if (Center.Equals(centerPosition))
 					return;
 
 				Center = centerPosition;
-                LastMoveToRegion = new MapSpan(Center, LastMoveToRegion.LatitudeDegrees, LastMoveToRegion.LongitudeDegrees);
+				LastMoveToRegion = new MapSpan(Center, LastMoveToRegion.LatitudeDegrees, LastMoveToRegion.LongitudeDegrees);
 
 				// We don't need to resend event again
 				return;
@@ -194,29 +196,29 @@ namespace Mapsui.Forms
 			// Did Viewport dimensions changed
 			if (e.PropertyName.Equals("Width") | e.PropertyName.Equals("Height"))
 			{
-                // Do this the first time after Viewport has correct size
-                if (init)
-                {
-                    map.NavigateTo(LastMoveToRegion.ToMapsui());
-                    init = false;
-                }
+				// Do this the first time after Viewport has correct size
+				if (init)
+				{
+					map.NavigateTo(LastMoveToRegion.ToMapsui());
+					init = false;
+				}
 
-                // Raise event, that VisibleRegion has changed
-                RaisePropertyChanged(nameof(VisibleRegion));
+				// Raise event, that VisibleRegion has changed
+				RaisePropertyChanged(nameof(VisibleRegion));
 
-                return;
+				return;
 			}
 
-            // Did Viewport resolution changed
-            if (e.PropertyName.Equals("Resolution"))
-            {
-                var bottomLeft = map.Viewport.Extent.BottomLeft.ToForms();
-                var topRight = map.Viewport.Extent.TopRight.ToForms();
+			// Did Viewport resolution changed
+			if (e.PropertyName.Equals("Resolution"))
+			{
+				var bottomLeft = map.Viewport.Extent.BottomLeft.ToForms();
+				var topRight = map.Viewport.Extent.TopRight.ToForms();
 
-                LastMoveToRegion = new MapSpan(Center, Math.Abs(bottomLeft.Latitude - topRight.Latitude), Math.Abs(bottomLeft.Longitude - topRight.Longitude));
-            }
+				LastMoveToRegion = new MapSpan(Center, Math.Abs(bottomLeft.Latitude - topRight.Latitude), Math.Abs(bottomLeft.Longitude - topRight.Longitude));
+			}
 
-            RaisePropertyChanged(e.PropertyName);
+			RaisePropertyChanged(e.PropertyName);
 		}
 
 		/// <summary>
